@@ -1,5 +1,6 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:task_manager_app/services/tasks_service.dart';
 import 'package:task_manager_app/ui/add_task_bar.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/button.dart';
+import 'package:task_manager_app/ui/widgets/task_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({ Key? key }) : super(key: key);
@@ -56,58 +58,12 @@ class _HomePageState extends State<HomePage> {
         children: [
           _addTaskBar(),
           _addDateBar(),
-          _showTasks1(),
+          SizedBox(height: 10,),
+          _showTasks(),
         ],
       )
     );
   }
-
-  _showTasks(){
-    return Builder(
-        builder: (_){
-          if(_isLoading){
-            return CircularProgressIndicator();
-          }
-          if(_apiResponse.error){
-            return Center(child: Text(_apiResponse.errorMessage.toString()));
-          }
-          
-          return Expanded(
-            child: ListView.separated(
-                shrinkWrap: true,
-                separatorBuilder: (_, __) =>
-                    Divider(height: 1, color: Colors.green),
-                itemBuilder: (_, index) {
-                  return Dismissible(
-                    key: ValueKey(_apiResponse.data![index].id),
-                    direction: DismissDirection.startToEnd,
-                    onDismissed: (direction) {},
-                    background: Container(
-                      color: Colors.red,
-                      padding: EdgeInsets.only(left: 16),
-                      child: Align(
-                        child: Icon(Icons.delete, color: Colors.white),
-                        alignment: Alignment.centerLeft,
-                      ),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                       "ciao",
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                      subtitle: Text(
-                          'Last edited on',
-                    ),
-                  ),
-                  );
-                },
-                itemCount: _apiResponse.data!.length,
-              ),
-          );
-        },
-      );
-  }
-
 
   _addDateBar(){
     return Container(
@@ -141,7 +97,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         onDateChange: (date) {
-          _selectedDate = date;
+
+          setState(() {
+            _selectedDate = date;
+          });
         },
       ),
     );
@@ -192,7 +151,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _showTasks1(){
+  _showTasks(){
       return Builder(
           builder: (_){
             if(_isLoading){
@@ -205,27 +164,143 @@ class _HomePageState extends State<HomePage> {
             return Expanded(
               child: Obx((){
                 return ListView.builder(
-                  itemCount: _apiResponse.data!.length,
-                  itemBuilder: (_,context){
-                    print(_apiResponse.data!.length);
-                    return Container(
-                      width: 100,
-                      height: 50,
-                      color: Colors.green,
-                      margin: const EdgeInsets.only(bottom: 10),
-                    );
-                  });
+                itemCount: _apiResponse.data!.length,
+                itemBuilder: (_, index) {
+                  print(_apiResponse.data!.length);
+                  Task task = _apiResponse.data![index];
+                  if(task.date == DateFormat.yMd().format(_selectedDate)){
+                    return AnimationConfiguration.staggeredList(
+                    position: index, 
+                    child: SlideAnimation(
+                      child: FadeInAnimation(
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: ()async{
+                                _showBottomSheet(context, task);
+                              },
+                              child: TaskTile(task)
+                            )
+                          ],
+                        )
+                      ),
+                    )
+                  );
+                } else {
+                  return Container();
+                 /* return AnimationConfiguration.staggeredList(
+                    position: index, 
+                    child: SlideAnimation(
+                      child: FadeInAnimation(
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: ()async{
+                                _showBottomSheet(context, task);
+                              },
+                              child: TaskTile(task)
+                            )
+                          ],
+                        )
+                      ),
+                    )
+                  ); */
+                }
+                
+                });
               }),
             );
           },
         );
     }
 
+  _showBottomSheet(BuildContext context, Task task) {
+    Get.bottomSheet(
+      Container(
+          padding: const EdgeInsets.only(top: 4),
+          height: task.isCompleted == 1
+              ? MediaQuery.of(context).size.height * 0.24
+              : MediaQuery.of(context).size.height * 0.32,
+          color: Colors.white,
+          child: Column(
+            children: [
+              Container(
+                height: 6,
+                width: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[300],
+                ),
+              ),
+              Spacer(),
+              task.isCompleted == 1?
+              Container():
+              _bottomSheetButton(
+                label: "Task Completed", 
+                onTap: ()async{
+                  print(task.isCompleted);
+                  final result = await service.completeTask(task.id.toString(), 1.toString());
+                  _fetchTasks();
+                  Get.back();
+                }, 
+                clr: Colors.blue,
+                context: context
+              ),
+              _bottomSheetButton(
+                label: "Delete Task", 
+                onTap: ()async{
+                  final result = await service.deleteTask(task.id.toString());
+                  _fetchTasks();
+                  Get.back();
+                }, 
+                clr: Colors.red[300]!,
+                context: context
+              ),
+              SizedBox(height: 20,),
+              _bottomSheetButton(
+                label: "Close", 
+                onTap: (){
+                  Get.back();
+                }, 
+                clr: Colors.white,
+                isClose : true,
+                context: context
+              ),
+              SizedBox(height: 10,),
+            ],
+          )),
+    );
+  }
 
-
-
-
-
-
-
+  _bottomSheetButton({
+    required String label,
+    required Function()? onTap,
+    required Color clr,
+    bool isClose = false,
+    required BuildContext context
+  }){
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        height: 55,
+        width: MediaQuery.of(context).size.width*0.9,
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: isClose == true ? Colors.grey[300]!:clr,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          color: isClose == true ? Colors.transparent:clr,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: isClose ? titleStyle.copyWith(color: Colors.black) : titleStyle.copyWith(color: Colors.white)
+          ),
+        )
+      ),
+    );
+  }
+  
 }

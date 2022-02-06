@@ -36,5 +36,28 @@ class TasksService {
     }).catchError((_)=>APIResponse<bool>(error: true,errorMessage: 'An error occurred'));
   }
 
+  Future<APIResponse<bool>> deleteTask(String id){
+    final Map<String,dynamic> taskId = new Map<String,dynamic>();
+    taskId['id'] = id;
+    return http.delete(Uri.parse(API + '/delete.php'),body: json.encode(taskId)).then((data){
+      if(data.statusCode == 204){
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(data: true,errorMessage: 'An error occurred');
+    }).catchError((_)=>APIResponse<bool>(error: true, errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<bool>> completeTask(String id, String complete){
+    final Map<String,dynamic> taskComplete = new Map<String,dynamic>();
+    taskComplete['id'] = id;
+    taskComplete['isCompleted'] = complete;
+    return http.put(Uri.parse(API + '/complete.php'),body: json.encode(taskComplete)).then((data){
+      if(data.statusCode == 204){
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(error: true,errorMessage: 'An error occurred');
+    }).catchError((_)=>APIResponse<bool>(error: true,errorMessage: 'An error occurred'));
+  }
+
   
 }

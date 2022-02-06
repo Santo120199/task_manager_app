@@ -287,6 +287,5 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
     final result = await service.createTask(task);
     print("added");
-  
   }
 }
