@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
 import 'package:task_manager_app/ui/home_page.dart';
+import 'package:task_manager_app/ui/widgets/splash_screen.dart';
+
 
 void setupLocator(){
   GetIt.I.registerLazySingleton(() => TasksService());
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: SplashScreen(title:'ua gas'),
     );
   }
 }
