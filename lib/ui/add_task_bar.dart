@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/models/task.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
 import 'package:task_manager_app/ui/theme.dart';
@@ -166,8 +167,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         child: Icon(Icons.arrow_back,size:20),
       ),
       actions: [
-          Icon(Icons.person,size:20),
+          Icon(Icons.person,size:20,),
           SizedBox(width: 20,)
+          
         ],
     );
   }
@@ -277,14 +279,18 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   _addTask()async{
-   final task =  Task(
-      note: _noteController.text,
-      title: _titleController.text,
-      date: DateFormat.yMd().format(_selectedDate),
-      startTime: _startTime,
-      endTime: _endTime,
-      remind: _selectedRemind
-    );
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var id = sharedPreferences.get('id');
+    final task = Task(
+        note: _noteController.text,
+        title: _titleController.text,
+        date: DateFormat.yMd().format(_selectedDate),
+        startTime: _startTime,
+        endTime: _endTime,
+        remind: _selectedRemind,
+        userId: int.parse(id.toString()),
+      );
+        
     final result = await service.createTask(task);
     print("added");
   }

@@ -1,9 +1,13 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/services/users_service.dart';
 import 'package:task_manager_app/ui/common/theme_helper.dart';
+import 'package:task_manager_app/ui/home_page.dart';
 import 'package:task_manager_app/ui/profile_page.dart';
+import 'package:task_manager_app/ui/registration_page.dart';
 import 'package:task_manager_app/ui/widgets/header_widget.dart';
 
 class LoginPage extends StatefulWidget {
@@ -78,7 +82,21 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Container(
                             margin: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                            child: Text("Don\'t have an account? Create"),
+                            //child: Text("Don\'t have an account? Create"),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(text: "Don\'t have an account? "),
+                                  TextSpan(
+                                    text: "Create",
+                                    recognizer: TapGestureRecognizer()..onTap = (){
+                                      Get.to(()=>RegistrationPage());  
+                                    },
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
+                                  ),
+                                ] 
+                              )
+                            ),
                           )
 
                         ],
@@ -114,8 +132,9 @@ class _LoginPageState extends State<LoginPage> {
     String pass = _passController.text;
 
     final result = await userService.login(email,pass);
-    
-    if(result.data == false){
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    print(result.data?['username']);
+    if(result.data?['status'] == 401){
       Get.snackbar("Danger", "Invalid Credentials",
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.white,
@@ -123,7 +142,10 @@ class _LoginPageState extends State<LoginPage> {
       icon: Icon(Icons.password_outlined)
       );
     }else {
-      Get.to(()=>ProfilePage());
+      sharedPreferences.setString('id',result.data?['id']);
+      sharedPreferences.setString('username',result.data?['username']);
+      sharedPreferences.setString('email', result.data?['email']);
+      Get.to(()=>HomePage());
     }
 
   }

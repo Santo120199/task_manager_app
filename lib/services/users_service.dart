@@ -20,9 +20,18 @@ class UsersService {
         final jsonData = json.decode(data.body);
         Map<String,dynamic> user = new Map<String,dynamic>();
         print(jsonData);
-        return APIResponse<Map>(data:user);
+        return APIResponse<Map>(data:jsonData);
       }
       return APIResponse<Map>(error:true,errorMessage: 'An error occurred');
+    }).catchError((_)=>APIResponse<bool>(error: true,errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<bool>> register(User user){
+    return http.post(Uri.parse(API + '/register.php'),body: json.encode(user.toJson())).then((data){
+      if(data.statusCode == 200){
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(data:true,errorMessage: 'An error occurred');
     }).catchError((_)=>APIResponse<bool>(error: true,errorMessage: 'An error occurred'));
   }
 }

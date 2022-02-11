@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/ui/login_page.dart';
 import 'package:task_manager_app/ui/widgets/header_widget.dart';
 import 'package:task_manager_app/ui/widgets/splash_screen.dart';
 
@@ -14,6 +16,26 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
 
   double _drawerIconSize= 24;
+  String email = "";
+  String username = "";
+
+  Future user()async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userEmail = sharedPreferences.getString('email');
+    var userUsername = sharedPreferences.getString('username');
+    setState(() {
+      email = userEmail!;
+      username = userUsername!;
+      print(username);  
+    });
+  }
+
+  @override
+  void initState() {
+    user();
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: Container(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Davide",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color:Colors.white),),
+                  child: Text(username.toUpperCase(),style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color:Colors.white),),
                 ),
               ),
               ListTile(
@@ -86,6 +108,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: Text("Splash Screen", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
                 onTap: ()async{
                   await Get.to(()=>SplashScreen(title: "Splash Screen"));
+                }
+              ),
+              ListTile(
+                leading: Icon(Icons.logout_rounded,size: _drawerIconSize,color: Colors.blue[200]!,),
+                title: Text("Logout", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
+                onTap: ()async{
+                  _logout();
                 }
               )
             ],
@@ -118,7 +147,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Icon(Icons.person, size: 80, color:Colors.grey.shade400),
                   ),
                   SizedBox(height: 20,),
-                  
+                  Text('Mr.'+username.toUpperCase(), style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20,),
+                  Text('Former President', style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20,),
                 ],
               )
             )
@@ -126,5 +158,12 @@ class _ProfilePageState extends State<ProfilePage> {
         )
       )
     );
+  }
+
+  _logout()async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove('username');
+    sharedPreferences.remove('email');
+    Get.to(()=>LoginPage());
   }
 }

@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/models/api_response.dart';
 import 'package:task_manager_app/models/task.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
 import 'package:task_manager_app/ui/add_task_bar.dart';
+import 'package:task_manager_app/ui/profile_page.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/button.dart';
 import 'package:task_manager_app/ui/widgets/task_tile.dart';
@@ -22,7 +24,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  DateTime _selectedDate = DateTime.now(); 
+  DateTime _selectedDate = DateTime.now();
+ 
 
   TasksService get service => GetIt.I<TasksService>();
 
@@ -41,7 +44,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = true;
     });
-    _apiResponse = await service.getTasksList();
+      
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userId = sharedPreferences.getString('id');
+    _apiResponse = await service.getTasksList(userId!);
     print(_apiResponse.data);
     setState(() {
       _isLoading = false;
@@ -140,14 +146,11 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       leading: GestureDetector(
         onTap:(){
-          print("tapped");
+          Get.to(()=>ProfilePage());
         },
-        child: Icon(Icons.nightlight_round,size:20),
+        child: Icon(Icons.person,size:20),
       ),
-      actions: [
-          Icon(Icons.person,size:20),
-          SizedBox(width: 20,)
-        ],
+      
     );
   }
 
@@ -238,7 +241,7 @@ class _HomePageState extends State<HomePage> {
               _bottomSheetButton(
                 label: "Task Completed", 
                 onTap: ()async{
-                  print(task.isCompleted);
+                  
                   final result = await service.completeTask(task.id.toString(), 1.toString());
                   _fetchTasks();
                   Get.back();

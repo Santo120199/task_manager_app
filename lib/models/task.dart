@@ -9,6 +9,7 @@ class Task {
   String? startTime;
   String? endTime;
   int? remind;
+  int? userId;
   
 
   Task({
@@ -20,6 +21,7 @@ class Task {
     this.startTime,
     this.endTime,
     this.remind,
+    this.userId,
   });
 
   factory Task.fromJson(Map<String,dynamic> item){
@@ -46,6 +48,7 @@ class Task {
     item['startTime'] = this.startTime;
     item['endTime'] = this.endTime;
     item['remind'] = this.remind;
+    item['userId'] = this.userId;
 
     return item;
   }

@@ -17,6 +17,16 @@ class ThemeHelper {
     );
   }
 
+  BoxDecoration inputBoxDecorationShadow(){
+    return BoxDecoration(boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 20,
+        offset: Offset(0,5),
+      )
+    ]);
+  }
+
   BoxDecoration buttonBoxDecoration(BuildContext context,[String color1 = "",String color2=""]){
     Color c1 = Colors.blue;
     Color c2 = Colors.blue[200]!;

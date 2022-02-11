@@ -9,8 +9,11 @@ class TasksService {
 
   static const API = 'http://192.168.56.1/API_Task_Manager/api/task';
 
-  Future<APIResponse<List<Task>>> getTasksList(){
-    return http.get(Uri.parse(API + '/read.php')).then((data){
+  Future<APIResponse<List<Task>>> getTasksList(String userId){
+    final Map<String,dynamic> id = new Map<String,dynamic>();
+    id['userId'] = userId;
+
+    return http.post(Uri.parse(API + '/read.php'),body:json.encode(id)).then((data){
       if(data.statusCode == 200){
         final jsonData = json.decode(data.body);
         final jsonD = jsonData['data'];
