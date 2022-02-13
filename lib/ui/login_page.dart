@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/services/users_service.dart';
 import 'package:task_manager_app/ui/common/theme_helper.dart';
+import 'package:task_manager_app/ui/forgot_password_page.dart';
 import 'package:task_manager_app/ui/home_page.dart';
 import 'package:task_manager_app/ui/profile_page.dart';
 import 'package:task_manager_app/ui/registration_page.dart';
@@ -65,7 +66,13 @@ class _LoginPageState extends State<LoginPage> {
                           Container(
                             margin: const EdgeInsets.fromLTRB(10, 0, 10, 20),
                             alignment: Alignment.topRight,
-                            child: Text("Forgot your password")
+                            child: Text.rich(
+                              TextSpan(text: "Forgot your Password?",
+                                recognizer: TapGestureRecognizer()..onTap =(){
+                                  Get.to(()=>ForgotPassword());
+                                }
+                              )
+                            ),
                           ),
                           Container(
                             decoration: ThemeHelper().buttonBoxDecoration(context),

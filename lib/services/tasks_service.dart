@@ -27,7 +27,7 @@ class TasksService {
         return APIResponse<List<Task>>(data: tasks.obs);
       }
       return APIResponse<List<Task>>(error: true, errorMessage: "An error occurred");
-    }).catchError((_)=>APIResponse<List<Task>>(error:true,errorMessage: 'An error occurred shit'));
+    }).catchError((_)=>APIResponse<List<Task>>(error:true,errorMessage: 'No task for this user'));
   }
 
   Future<APIResponse<bool>> createTask(Task item){

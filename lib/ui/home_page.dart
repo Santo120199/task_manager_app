@@ -13,7 +13,11 @@ import 'package:task_manager_app/ui/add_task_bar.dart';
 import 'package:task_manager_app/ui/profile_page.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/button.dart';
+import 'package:task_manager_app/ui/widgets/drawer_widget.dart';
 import 'package:task_manager_app/ui/widgets/task_tile.dart';
+
+import 'common/drawer_item.dart';
+import 'common/drawer_item_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({ Key? key }) : super(key: key);
@@ -26,6 +30,12 @@ class _HomePageState extends State<HomePage> {
 
   DateTime _selectedDate = DateTime.now();
  
+ 
+  var _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  DrawerItem item = DrawerItems.home;
+
+
 
   TasksService get service => GetIt.I<TasksService>();
 
@@ -37,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     _fetchTasks();
+    _showTasks();
     super.initState();
   }
 
@@ -49,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     var userId = sharedPreferences.getString('id');
     _apiResponse = await service.getTasksList(userId!);
     print(_apiResponse.data);
+    print(DateFormat.yMd().format(_selectedDate));
     setState(() {
       _isLoading = false;
     });
@@ -58,18 +70,39 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    
     return Scaffold(
-      appBar: _appBar(),
-      body: Column(
-        children: [
-          _addTaskBar(),
-          _addDateBar(),
-          SizedBox(height: 10,),
-          _showTasks(),
-        ],
+      key: _scaffoldKey,
+      appBar: _appBar(context),
+      drawer: buildDrawer(),
+      body: RefreshIndicator(
+        onRefresh: ()async{
+          await _fetchTasks();
+
+        },
+        child: Column(
+          children: [
+            _addTaskBar(),
+            _addDateBar(),
+            SizedBox(height: 10,),
+            _showTasks(),
+          ],
+        ),
       )
     );
   }
+
+  Widget buildDrawer()=> SafeArea(
+    child: DrawerWidget(
+      onSelectedItem: (item){
+        setState(() {
+          this.item = item;
+          
+        });
+      },
+    
+    ));
 
   _addDateBar(){
     return Container(
@@ -142,11 +175,11 @@ class _HomePageState extends State<HomePage> {
           );
   }
 
-  _appBar(){
+  _appBar(BuildContext context){
     return AppBar(
       leading: GestureDetector(
         onTap:(){
-          Get.to(()=>ProfilePage());
+          _scaffoldKey.currentState?.openDrawer();
         },
         child: Icon(Icons.person,size:20),
       ),
@@ -171,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (_, index) {
                   print(_apiResponse.data!.length);
                   Task task = _apiResponse.data![index];
-                  if(task.date == DateFormat.yMd().format(_selectedDate)){
+                  if(task.date == DateFormat.yMd().format(_selectedDate)){        //DATE FORMAT: 2/15/2022
                     return AnimationConfiguration.staggeredList(
                     position: index, 
                     child: SlideAnimation(

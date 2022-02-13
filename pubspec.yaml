@@ -43,7 +43,7 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   hexcolor: ^2.0.6
   shared_preferences: ^2.0.13
- 
+  font_awesome_flutter: ^9.2.0
 
 dev_dependencies:
   flutter_test:
