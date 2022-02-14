@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/ui/common/drawer_item.dart';
+import 'package:task_manager_app/ui/common/drawer_item_data.dart';
 import 'package:task_manager_app/ui/login_page.dart';
+import 'package:task_manager_app/ui/widgets/drawer_widget.dart';
 import 'package:task_manager_app/ui/widgets/header_widget.dart';
 import 'package:task_manager_app/ui/widgets/splash_screen.dart';
 
@@ -18,6 +21,9 @@ class _ProfilePageState extends State<ProfilePage> {
   double _drawerIconSize= 24;
   String email = "";
   String username = "";
+
+  DrawerItem item = DrawerItems.home;
+
 
   Future user()async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -76,51 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
           )
         ],
       ),
-      drawer: Drawer(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0.0,1.0],
-              colors: [Colors.blue.withOpacity(0.2),Colors.blue[200]!.withOpacity(0.5)]
-            )
-          ),
-          child: ListView(
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    stops: [0.0,1.0],
-                    colors: [Colors.blue,Colors.blue[200]!]
-                  )
-                ),
-                child: Container(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(username.toUpperCase(),style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color:Colors.white),),
-                ),
-              ),
-              ListTile(
-                leading: Icon(Icons.screen_lock_landscape_rounded,size: _drawerIconSize,color: Colors.blue[200]!,),
-                title: Text("Splash Screen", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
-                onTap: ()async{
-                  await Get.to(()=>SplashScreen(title: "Splash Screen"));
-                }
-              ),
-              ListTile(
-                leading: Icon(Icons.logout_rounded,size: _drawerIconSize,color: Colors.blue[200]!,),
-                title: Text("Logout", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
-                onTap: ()async{
-                  _logout();
-                }
-              )
-            ],
-          )
-        )
-      ),
+      drawer: buildDrawer(),
       body: SingleChildScrollView(
         child: Stack(
           children: [
@@ -166,4 +128,60 @@ class _ProfilePageState extends State<ProfilePage> {
     sharedPreferences.remove('email');
     Get.to(()=>LoginPage());
   }
+  Widget buildDrawer()=> SafeArea(
+    child: DrawerWidget(
+      onSelectedItem: (item){
+        setState(() {
+          this.item = item;
+          print(item);
+        });
+      },
+    ));
+ 
 }
+
+/* drawer: Drawer(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0.0,1.0],
+              colors: [Colors.blue.withOpacity(0.2),Colors.blue[200]!.withOpacity(0.5)]
+            )
+          ),
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: [0.0,1.0],
+                    colors: [Colors.blue,Colors.blue[200]!]
+                  )
+                ),
+                child: Container(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(username.toUpperCase(),style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color:Colors.white),),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.screen_lock_landscape_rounded,size: _drawerIconSize,color: Colors.blue[200]!,),
+                title: Text("Splash Screen", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
+                onTap: ()async{
+                  await Get.to(()=>SplashScreen(title: "Splash Screen"));
+                }
+              ),
+              ListTile(
+                leading: Icon(Icons.logout_rounded,size: _drawerIconSize,color: Colors.blue[200]!,),
+                title: Text("Logout", style: TextStyle(fontSize: 17,color:Colors.blue[200]!)),
+                onTap: ()async{
+                  _logout();
+                }
+              )
+            ],
+          )
+        )
+      ), */

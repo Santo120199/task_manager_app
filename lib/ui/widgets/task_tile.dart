@@ -18,7 +18,7 @@ class TaskTile extends StatelessWidget {
         //  width: SizeConfig.screenWidth * 0.78,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.blue,
+          color: _getBCGlr(task?.color ?? 0),
         ),
         child: Row(
           children: [
@@ -91,5 +91,17 @@ class TaskTile extends StatelessWidget {
       ),
       
     );
+  }
+
+  _getBCGlr(int? cl){
+    print(cl);
+    switch(cl){
+      case 0:
+      return Colors.blue;
+      case 1:
+      return Colors.pink;
+      case 2: 
+      return Colors.yellow;
+    }
   }
 }

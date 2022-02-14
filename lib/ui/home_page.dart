@@ -1,6 +1,7 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     // TODO: implement initState
+    _showTasks();
     _fetchTasks();
     _showTasks();
     super.initState();
@@ -79,6 +81,7 @@ class _HomePageState extends State<HomePage> {
       body: RefreshIndicator(
         onRefresh: ()async{
           await _fetchTasks();
+          await _showTasks();
 
         },
         child: Column(
@@ -98,9 +101,10 @@ class _HomePageState extends State<HomePage> {
       onSelectedItem: (item){
         setState(() {
           this.item = item;
-          
+          print(item);
         });
       },
+
     
     ));
 
@@ -181,9 +185,8 @@ class _HomePageState extends State<HomePage> {
         onTap:(){
           _scaffoldKey.currentState?.openDrawer();
         },
-        child: Icon(Icons.person,size:20),
+        child: Icon(FontAwesomeIcons.bars,size:20),
       ),
-      
     );
   }
 
@@ -214,6 +217,7 @@ class _HomePageState extends State<HomePage> {
                             GestureDetector(
                               onTap: ()async{
                                 _showBottomSheet(context, task);
+                                 
                               },
                               child: TaskTile(task)
                             )

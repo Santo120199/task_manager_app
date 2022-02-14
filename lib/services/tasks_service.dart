@@ -7,7 +7,7 @@ import "package:http/http.dart" as http;
 
 class TasksService {
 
-  static const API = 'http://192.168.56.1/API_Task_Manager/api/task';
+  static const API = 'http://192.168.1.59/API_Task_Manager/api/task';
 
   Future<APIResponse<List<Task>>> getTasksList(String userId){
     final Map<String,dynamic> id = new Map<String,dynamic>();

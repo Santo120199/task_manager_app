@@ -9,7 +9,7 @@ import 'package:task_manager_app/models/user.dart';
 import 'package:task_manager_app/models/user.dart';
 
 class UsersService {
-  static const API = 'http://192.168.56.1/API_Task_Manager/api/user';
+  static const API = 'http://192.168.1.59/API_Task_Manager/api/user';
 
   Future<APIResponse<Map>>  login(String email, String password){
     final Map<String,dynamic> loginUser = new Map<String,dynamic>();

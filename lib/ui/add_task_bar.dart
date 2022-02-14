@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/models/task.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
+import 'package:task_manager_app/ui/home_page.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/button.dart';
 import 'package:task_manager_app/ui/widgets/input_field.dart';
@@ -236,6 +237,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               onTap: () {
                 setState(() {
                   _selectedColor = index;
+                  print(_selectedColor);
                 });
               },
               child: Padding(
@@ -266,7 +268,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   _validateData(){
     if(_titleController.text.isNotEmpty && _noteController.text.isNotEmpty){
       _addTask();
-      Get.back();
+      Get.to(()=>HomePage());
     }else if(_titleController.text.isEmpty || _noteController.text.isEmpty){
       Get.snackbar("Required", "All fields are required !",
         snackPosition: SnackPosition.BOTTOM,
@@ -289,6 +291,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         endTime: _endTime,
         remind: _selectedRemind,
         userId: int.parse(id.toString()),
+        color: _selectedColor
       );
         
     final result = await service.createTask(task);
