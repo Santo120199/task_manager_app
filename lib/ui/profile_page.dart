@@ -24,6 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   DrawerItem item = DrawerItems.home;
 
+  
+
 
   Future user()async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

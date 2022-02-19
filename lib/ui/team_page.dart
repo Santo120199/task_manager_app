@@ -9,6 +9,7 @@ import 'package:task_manager_app/models/user.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
 import 'package:task_manager_app/ui/common/drawer_item.dart';
 import 'package:task_manager_app/ui/common/drawer_item_data.dart';
+import 'package:task_manager_app/ui/create_team.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/drawer_widget.dart';
 import 'package:task_manager_app/ui/widgets/header_widget.dart';
@@ -100,38 +101,62 @@ class _TeamPageState extends State<TeamPage> {
     );
   }
 
-  _header(){
+  _header() {
     return Stack(
       children: [
         Container(
-          height: 100,
-          child: HeaderWidget(
             height: 100,
-            showIcon: false,
-            icon: Icons.house_rounded,
-          )),
-          Container(
-            alignment: Alignment.center,
-            margin: const EdgeInsets.fromLTRB(25, 20, 25, 10),
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child:Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(top:10,bottom: 10,left: 8,right: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(width: 5,color:Colors.white),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black12,blurRadius: 20, offset: Offset(5,5))
-                    ]
-                  ),
-                  child: Icon(FontAwesomeIcons.users,size:70,color: Colors.blue.shade800,),
-                )
-              ],
-            ),
-            
-          )
+            child: HeaderWidget(
+              height: 100,
+              showIcon: false,
+              icon: Icons.house_rounded,
+            )),
+        Container(
+          alignment: Alignment.center,
+          margin: const EdgeInsets.fromLTRB(25, 20, 25, 10),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  Stack(children: [
+                    Container(
+                      padding: const EdgeInsets.only(
+                          top: 10, bottom: 10, left: 8, right: 20),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          border: Border.all(width: 5, color: Colors.white),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 20,
+                                offset: Offset(5, 5))
+                          ]),
+                      child: Icon(
+                        FontAwesomeIcons.users,
+                        size: 70,
+                        color: Colors.blue.shade800,
+                      ),
+                    
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(70, 70, 0, 0),
+                        child: Tooltip(
+                          message: "Create New Team",
+                          waitDuration: Duration(milliseconds: 500),
+                          child: IconButton(onPressed: (){
+                            Get.to(()=>CreateTeam());
+                          }, icon: Icon(Icons.add_circle,
+                              color: Colors.grey.shade700, size: 30.0),),
+                        ),
+                      )
+                  ]),
+                ],
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
