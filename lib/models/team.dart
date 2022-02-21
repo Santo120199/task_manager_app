@@ -10,8 +10,8 @@ class Team {
     
     return Team(
       id: int.parse(item['id']),
-      name: item['username'],
-      createdBy: item['email'],
+      name: item['name'],
+      createdBy: int.parse(item['createdBy']),
     );
   }
 

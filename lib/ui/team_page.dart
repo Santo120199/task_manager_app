@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/models/api_response.dart';
-import 'package:task_manager_app/models/task.dart';
-import 'package:task_manager_app/models/user.dart';
-import 'package:task_manager_app/services/tasks_service.dart';
+import 'package:task_manager_app/models/team.dart';
+import 'package:task_manager_app/services/teams_service.dart';
 import 'package:task_manager_app/ui/common/drawer_item.dart';
 import 'package:task_manager_app/ui/common/drawer_item_data.dart';
 import 'package:task_manager_app/ui/create_team.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/drawer_widget.dart';
 import 'package:task_manager_app/ui/widgets/header_widget.dart';
-import 'package:task_manager_app/ui/widgets/user_widget.dart';
+
 
 class TeamPage extends StatefulWidget {
   const TeamPage({ Key? key }) : super(key: key);
@@ -28,9 +28,9 @@ class _TeamPageState extends State<TeamPage> {
 
    DrawerItem item = DrawerItems.home;
 
-  TasksService get service => GetIt.I<TasksService>();
+  TeamsService get service => GetIt.I<TeamsService>();
 
-  late APIResponse<List<Task>> _apiResponse;
+  late APIResponse<List<Team>> _apiResponse;
   bool _isLoading = false;
 
   @override
@@ -46,7 +46,7 @@ class _TeamPageState extends State<TeamPage> {
       
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userId = sharedPreferences.getString('id');
-    _apiResponse = await service.getTasksList(userId!);
+    _apiResponse = await service.getTeamList(userId!);
     print(_apiResponse.data);
     
     setState(() {
@@ -97,7 +97,7 @@ class _TeamPageState extends State<TeamPage> {
     return Container(
           margin: const EdgeInsets.only(top: 20),
           alignment: Alignment.topCenter,
-          child: Text('Team Member',style: headingStyle),
+          child: Text('Your Teams',style: headingStyle),
     );
   }
 
@@ -164,19 +164,50 @@ class _TeamPageState extends State<TeamPage> {
 
 
   _showUser(){
-    return Expanded(
-      child:  Obx((){
-        return ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: _apiResponse.data!.length,
-          itemBuilder: (_,index){
-            print(_apiResponse.data!.length);
-            return Container(
-              child: UserWidget(),
+    return Builder(
+      builder: (_) {
+
+        if(_isLoading){
+          return CircularProgressIndicator();
+        }
+        if(_apiResponse.error){
+          return Center(child: Text(_apiResponse.errorMessage.toString()));
+        }
+
+        return Expanded(
+          child:  Obx((){
+            return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _apiResponse.data!.length,
+              itemBuilder: (_,index){
+                print(_apiResponse.data!.length);
+                Team team = _apiResponse.data![index];
+                return Container(
+                  child: _userWidget(team),
+                );
+              }
             );
-          }
+          })
         );
-      })
+      }
+    );
+  }
+
+  _userWidget (Team team){
+    return Container(
+      width: 100,
+      margin: const EdgeInsets.only(left: 15),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 40,
+          ),
+          SizedBox(height: 10,),
+          Text(team.name!,style: GoogleFonts.lato(
+            textStyle: TextStyle(fontSize: 18)
+          ),),
+        ],
+      ),
     );
   }
 
