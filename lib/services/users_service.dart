@@ -34,4 +34,27 @@ class UsersService {
       return APIResponse<bool>(data:true,errorMessage: 'An error occurred');
     }).catchError((_)=>APIResponse<bool>(error: true,errorMessage: 'An error occurred'));
   }
+
+  Future<APIResponse<List<User>>> userList(String userId){
+
+    final Map<String,dynamic> id = Map<String,dynamic>();
+    id['id'] = userId;
+
+    return http.post(Uri.parse(API + '/readUser.php'),body: json.encode(id)).then((data){
+      if(data.statusCode == 200){
+        final jsonData = json.decode(data.body);
+        final jsonD = jsonData['data'];
+        final users = <User>[];
+        print(jsonD);
+
+        for(var item in jsonD){
+          users.add(User.fromJson(item));
+          print(item);
+        }
+        return APIResponse<List<User>>(data: users);
+      }
+      return APIResponse<List<User>>(error: true,errorMessage: 'An error occurred');
+    }).catchError((_)=>APIResponse<List<User>>(error:true,errorMessage: 'An error shit'));
+  }
+
 }

@@ -1,12 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/models/api_response.dart';
 import 'package:task_manager_app/models/task.dart';
+import 'package:task_manager_app/models/team.dart';
 import 'package:task_manager_app/services/tasks_service.dart';
+import 'package:task_manager_app/services/teams_service.dart';
 import 'package:task_manager_app/ui/home_page.dart';
 import 'package:task_manager_app/ui/theme.dart';
 import 'package:task_manager_app/ui/widgets/button.dart';
@@ -44,6 +48,26 @@ class _AddTaskPageState extends State<AddTaskPage> {
     "Monthly",
   ];
   int _selectedColor = 0;
+
+  late APIResponse<List<Team>> _apiResponse;
+  TeamsService get service1 => GetIt.I<TeamsService>();
+  String team = "";
+
+
+   _fetchTeam()async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userId = sharedPreferences.getString('id');
+    _apiResponse = await service1.getTeamList(userId!);
+    print(_apiResponse.data);
+
+  }
+
+  @override
+  void initState() {
+    _fetchTeam();
+    team = "No team selected";
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,22 +192,29 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   },
                 ),
               ),
-              SizedBox(
-                height: 18,
+              MyInputField(
+                title: "Team",
+                hint: team,
+                widget: GestureDetector(
+                  child: Icon(Icons.add_rounded,size: 32,color: Colors.grey,),
+                  onTap: (){
+                    _showTeamDialog();
+                    
+                  }
+                  )
               ),
+              SizedBox(height: 18,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _colorPalette(),
-                 
-                  MyButton(label: "Add Team", onTap: () => _showTeamDialog() )
+                   MyButton(label: "Create Task", onTap: () => _validateData()),
                 ],
               ),
               SizedBox(
-                height: 18,
+                height: 20,
               ),
-              MyButton(label: "Create Task", onTap: () => _validateData())
             ],
           ),
         ),
@@ -357,17 +388,43 @@ class _AddTaskPageState extends State<AddTaskPage> {
       builder: (BuildContext context){
         return SimpleDialog(
           title: const Text("Select Team"),
-          children: <Widget>[
-            SimpleDialogOption(
-              padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 20),
-              child: Text('Option 1',style: TextStyle(fontSize: 15),),
+          children: [
+            Container(
+              width: 200,
+              height: 150,
+              child: ListView.builder(
+                itemCount: _apiResponse.data!.length,
+                itemBuilder: (_,index){
+                  return SimpleDialogOption(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,vertical:20),
+                    child: Row(
+                      children: [
+                        Icon(FontAwesomeIcons.users),
+                        SizedBox(width: 20,),
+                        Text(_apiResponse.data![index].name!,style: TextStyle(fontSize: 18),),
+                      ],
+                    ),
+                    onPressed: (){
+                      setState(() {
+                        team = _apiResponse.data![index].name!;
+                        Navigator.pop(context);
+                      });
+                    },
+                  );
+                },
+              ),
             )
-          ],
+          ]
         );
       }
     );
   }
 }
+
+/* SimpleDialogOption(
+              padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 20),
+              child: Text('Option 1',style: TextStyle(fontSize: 15),),
+            ) */
 
 class DialogWidget extends StatelessWidget {
   const DialogWidget({ Key? key }) : super(key: key);

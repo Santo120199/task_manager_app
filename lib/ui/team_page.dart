@@ -47,7 +47,9 @@ class _TeamPageState extends State<TeamPage> {
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userId = sharedPreferences.getString('id');
     _apiResponse = await service.getTeamList(userId!);
-    print(_apiResponse.data);
+    var user = _apiResponse.data![4].users!.split(",");
+
+    
     
     setState(() {
       _isLoading = false;

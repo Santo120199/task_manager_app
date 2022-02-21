@@ -5,8 +5,11 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/models/api_response.dart';
 import 'package:task_manager_app/models/team.dart';
+import 'package:task_manager_app/models/user.dart';
 import 'package:task_manager_app/services/teams_service.dart';
+import 'package:task_manager_app/services/users_service.dart';
 import 'package:task_manager_app/ui/common/drawer_item.dart';
 import 'package:task_manager_app/ui/common/drawer_item_data.dart';
 import 'package:task_manager_app/ui/team_page.dart';
@@ -28,16 +31,22 @@ class _CreateTeamState extends State<CreateTeam> {
   DrawerItem item = DrawerItems.home;
 
   TeamsService get service => GetIt.I<TeamsService>();
+  UsersService get serviceUser => GetIt.I<UsersService>();
 
   TextEditingController teamNameController = TextEditingController();
   String userId ="";
+  late APIResponse<List<User>> _apiResponse;
 
   Future user()async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var id = sharedPreferences.getString('id');
 
+    _apiResponse = await serviceUser.userList(id!);
+
+    print(_apiResponse.data![0]);
+
     setState(() {
-      userId = id!;
+      userId = id;
       print(userId);
     });
   }
@@ -71,6 +80,7 @@ class _CreateTeamState extends State<CreateTeam> {
              ),
            ),
            SizedBox(height: 20,),
+          
            MyButton(label: "Create Team", onTap: (){
              _validateData();
            })
@@ -144,8 +154,17 @@ class _CreateTeamState extends State<CreateTeam> {
 
     final result = await service.createTeam(team);
     print("data");
-    
+  }
 
+  _showUser(){
+    return Expanded(
+      child: DropdownButtonHideUnderline(
+        child: ButtonTheme(
+          alignedDropdown: true,
+          child: Container()
+        ),
+      ),
+    );
   }
 
 }

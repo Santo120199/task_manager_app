@@ -13,7 +13,7 @@ class User {
       id: int.parse(item['id']),
       username: item['username'],
       email: item['email'],
-      password: item['password'],
+    
     );
   }
 
